@@ -1,3 +1,4 @@
+from keyboard import write
 from pyautogui import *
 from time import sleep, time
 from keyboard import wait, is_pressed
@@ -48,17 +49,9 @@ Lotes: {lotes}""")
 
     #print("Conferiu o número de lote e foi pra aba do faturamento?")
     #wait_enter()
-    click(x=33, y=71)
-    pause(0.5)
-    click(x=126, y=129)
-    pause(1.5)
-    click(x=14, y=31)
-    pause()
-    moveTo(x=103, y=274)
-    pause(0.7)
-    moveTo(x=366, y=315)
-    pause()
-    click(x=366, y=315)
+    click(x=103, y=74) # BUSCA DE MODULOS
+    write("MTM216")
+    enter__()
 
     res = wait_enter()
     if not res:

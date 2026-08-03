@@ -6,6 +6,8 @@ from tkinter import messagebox
 from Interface.Status.status_frame import StatusFrame
 from Interface.Materia_Prima.materia_prima_frame import MateriaPrimaFrame
 from Interface.CTE.notas_cte_frame import NotasCTEFrame
+from Interface.Uso_Consumo.uso_consumo_frame import UsoConsumoFrame
+from Interface.Almoxarifado.almoxarifado_frame import AlmoxarifadoFrame
 
 # Configurações iniciais do CustomTkinter
 ctk.set_appearance_mode("Dark")
@@ -118,9 +120,9 @@ class JanelaPrincipal(ctk.CTk):
         self.menu_items = [
             ("materia_prima", "  NOTAS DE MATÉRIA-PRIMA", self.abrir_materia_prima),
             ("notas_cte", "  NOTAS CTE", self.abrir_notas_cte),
-            ("uso_consumo", "  NOTAS DE USO E CONSUMO", lambda: self.menu_em_desenvolvimento("Notas de Uso e Consumo")),
+            ("uso_consumo", "  NOTAS DE USO E CONSUMO", self.abrir_uso_consumo),
             ("faturamento", "  FATURAMENTO", lambda: self.menu_em_desenvolvimento("Faturamento")),
-            ("almoxarifado", "  ALMOXARIFADO", lambda: self.menu_em_desenvolvimento("Almoxarifado")),
+            ("almoxarifado", "  ALMOXARIFADO", self.abrir_almoxarifado),
             ("ti", "  TI", lambda: self.menu_em_desenvolvimento("Módulo TI")),
             ("impressoras", "  IMPRESSORAS", lambda: self.menu_em_desenvolvimento("Impressoras"))
         ]
@@ -258,7 +260,7 @@ class JanelaPrincipal(ctk.CTk):
             corner_radius=0
         )
         self.rodape.grid(row=2, column=1, sticky="ew")
-        self.rodape.grid_columnconfigure((0, 1, 2), weight=1)
+        self.rodape.grid_columnconfigure((0, 1), weight=1)
 
         self.lbl_rodape_esq = ctk.CTkLabel(
             self.rodape,
@@ -267,14 +269,6 @@ class JanelaPrincipal(ctk.CTk):
             text_color=("#1E293B", "#94A3B8")
         )
         self.lbl_rodape_esq.grid(row=0, column=0, padx=20, pady=8, sticky="w")
-
-        self.lbl_rodape_centro = ctk.CTkLabel(
-            self.rodape,
-            text="2026 • TODOS OS DIREITOS RESERVADOS",
-            font=ctk.CTkFont(size=10, weight="bold"),
-            text_color=("#1E293B", "#94A3B8")
-        )
-        self.lbl_rodape_centro.grid(row=0, column=1, pady=8)
 
         # Indicador de perfil (ADMIN / OPERADOR)
         perfil = self.dados_usuario.get("perfil", "operador")
@@ -291,7 +285,7 @@ class JanelaPrincipal(ctk.CTk):
             font=ctk.CTkFont(size=10, weight="bold"),
             text_color=cor_perfil
         )
-        self.lbl_rodape_dir.grid(row=0, column=2, padx=20, pady=8, sticky="e")
+        self.lbl_rodape_dir.grid(row=0, column=1, padx=20, pady=8, sticky="e")
 
     def inicializar_abas(self):
         """Instancia os frames contidos nos arquivos externos e guarda no dicionário."""
@@ -313,6 +307,20 @@ class JanelaPrincipal(ctk.CTk):
         frame_cte = NotasCTEFrame(self.container_principal)
         frame_cte.grid(row=0, column=0, sticky="nsew")
         self.frames["notas_cte"] = frame_cte
+
+        # Frame 3: Notas de Uso e Consumo (uso_consumo_frame.py na pasta Interface/Uso_Consumo)
+        frame_uc = UsoConsumoFrame(self.container_principal)
+        frame_uc.grid(row=0, column=0, sticky="nsew")
+        self.frames["uso_consumo"] = frame_uc
+
+        # Frame 4: Almoxarifado (almoxarifado_frame.py na pasta Interface/Almoxarifado)
+        frame_almox = AlmoxarifadoFrame(
+            self.container_principal,
+            usuario_logado=self.usuario_logado,
+            dados_usuario=self.dados_usuario
+        )
+        frame_almox.grid(row=0, column=0, sticky="nsew")
+        self.frames["almoxarifado"] = frame_almox
 
     def selecionar_aba_inicial(self):
         """Abre a tela inicial de Status por padrão (sem aba no menu lateral)."""
@@ -347,6 +355,14 @@ class JanelaPrincipal(ctk.CTk):
 
     def abrir_notas_cte(self):
         self.selecionar_aba("notas_cte")
+
+    def abrir_uso_consumo(self):
+        self.selecionar_aba("uso_consumo")
+
+    def abrir_almoxarifado(self):
+        self.selecionar_aba("almoxarifado")
+        if "almoxarifado" in self.frames:
+            self.frames["almoxarifado"].carregar_se_necessario()
 
     def menu_em_desenvolvimento(self, nome_modulo):
         messagebox.showinfo("Módulo em Desenvolvimento", f"O módulo '{nome_modulo}' estará disponível em breve.")

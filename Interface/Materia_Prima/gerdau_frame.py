@@ -66,11 +66,15 @@ class GerdauFrame(ctk.CTkFrame):
         )
         self.btn_iniciar.pack(fill="x", padx=25, pady=(0, 20))
 
-    def processar_gerdau(self):
+        self.entry_chave.bind("<Return>", self.processar_gerdau)
+        self.entry_chave.bind("<KP_Enter>", self.processar_gerdau)
+        self.entry_chave.focus_set()
+
+    def processar_gerdau(self, e=None):
         chave = self.entry_chave.get().strip()
 
         if not chave:
             messagebox.showwarning("Campo Vazio", "Por favor, preencha a chave de acesso da Nota GERDAU.")
         else:
-            messagebox.showinfo("Lançamento GERDAU", f"Processando GERDAU:\n• Chave: {chave}")
+            #messagebox.showinfo("Lançamento GERDAU", f"Processando GERDAU:\n• Chave: {chave}")
             gerdau_start(chave)

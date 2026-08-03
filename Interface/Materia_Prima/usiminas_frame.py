@@ -67,6 +67,7 @@ class UsiminasFrame(ctk.CTkFrame):
             command=self.processar_usiminas
         )
         self.btn_iniciar.pack(fill="x", padx=25, pady=(0, 20))
+        self.entry_chave.bind("<Return>", lambda event: self.processar_usiminas())
 
     def processar_usiminas(self):
         chave = self.entry_chave.get().strip()
@@ -74,6 +75,6 @@ class UsiminasFrame(ctk.CTkFrame):
         if not chave:
             messagebox.showwarning("Campo Vazio", "Por favor, preencha a chave de acesso da Nota USIMINAS.")
         else:
-            messagebox.showinfo("Lançamento USIMINAS", f"Processando USIMINAS:\n• Chave: {chave}")
+            #messagebox.showinfo("Lançamento USIMINAS", f"Processando USIMINAS:\n• Chave: {chave}")
             usiminas_start(chave)
             

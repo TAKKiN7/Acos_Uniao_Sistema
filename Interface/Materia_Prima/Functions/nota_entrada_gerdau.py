@@ -62,65 +62,16 @@ Peso: {peso}""")
     if not res:
         return
 
-    clicks_tk = {
-    "x" : [14, 65, 341, 530, 103, 366],
-    "y" : [31, 252, 258, 293, 274, 315]
-}
-
-    clicks_laura = {
-    "x" : [14, 58, 311, 599, 83, 406],
-    "y" : [31, 234, 234, 272, 257, 274]
-}
     
-
-    x = clicks_tk.get("x")
-    y = clicks_tk.get("y")
 
     operador = "eustaquio"
     senha = "eustaqui"
 
-    #print("Pressione Mouse_4 para iniciar")
-    #wait_enter()
-    # pause(1)
-    click(x=33, y=71)
-    pause(0.5)
-    click(x=126, y=129)
-    pause(2)
-    
-    # click(x=x[0], y=y[0]) # diária
-    # pause()
-    # click(x=x[1], y=y[1]) # compras
-    # pause()
-    # click(x=x[2], y=y[2]) # cadastro
-    # pause()
-    # click(x=x[3], y=y[3]) # XML
-    # pause(2)
-    # write("916") # USINA
-    # click(x=792, y=523)  # OK
-    # pause()
 
-    # press("space")
-    # pause()
-    # for n in nota:
-    #     write(n)
-    # enter__()
-    # pause(1)
-    # enter__(1)
 
-    # res = wait_enter()
-    # if not res:
-    #     return
-
-    # for c in range(4):
-    #     press("esc")
-
-    click(x=x[0], y=y[0]) # diaria
-    pause()
-    moveTo(x=x[4], y=y[4]) # Nota entrada
-    pause(0.7)
-    moveTo(x=x[5], y=y[5]) # Digitação nota entrada
-    pause()
-    click(x=x[5], y=y[5]) # click em digitação nota entrada
+    click(x=103, y=74) # BUSCA DE MODULOS
+    write("MTM216")
+    enter__()
 
 
     res = wait_enter()

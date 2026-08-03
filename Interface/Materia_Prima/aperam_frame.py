@@ -1,5 +1,7 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from Interface.Materia_Prima.Functions.nota_entrada_aperam import aperam_start
+
 
 class AperamFrame(ctk.CTkFrame):
     """
@@ -86,6 +88,8 @@ class AperamFrame(ctk.CTkFrame):
             command=self.processar_aperam
         )
         self.btn_iniciar.pack(fill="x", padx=25, pady=(0, 20))
+        self.entry_chave.bind("<Return>", lambda event: self.processar_aperam())
+        
 
     def processar_aperam(self):
         lotes = self.entry_lotes.get().strip()
@@ -94,4 +98,5 @@ class AperamFrame(ctk.CTkFrame):
         if not lotes or not chave:
             messagebox.showwarning("Campos Incompletos", "Por favor, preencha a quantidade de lotes e a chave de acesso da Nota APERAM.")
         else:
-            messagebox.showinfo("Lançamento APERAM", f"Processando APERAM:\n• Lotes: {lotes}\n• Chave: {chave}")
+            #messagebox.showinfo("Lançamento APERAM", f"Processando APERAM:\n• Lotes: {lotes}\n• Chave: {chave}")
+            aperam_start(chave, lotes)
