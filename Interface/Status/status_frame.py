@@ -53,12 +53,6 @@ class StatusFrame(ctk.CTkFrame):
         header = ctk.CTkFrame(self.card_sobre, fg_color="transparent")
         header.pack(fill="x", padx=20, pady=(20, 10))
 
-        lbl_icon = ctk.CTkLabel(
-            header,
-            text="ℹ️",
-            font=ctk.CTkFont(size=22)
-        )
-        lbl_icon.pack(side="left", padx=(0, 10))
 
         lbl_title = ctk.CTkLabel(
             header,
@@ -78,7 +72,7 @@ class StatusFrame(ctk.CTkFrame):
 
         lbl_criado = ctk.CTkLabel(
             box_conteudo,
-            text="• Criado por: Tk",
+            text="• Criado por: TK",
             font=ctk.CTkFont(family="Segoe UI", size=13, weight="bold"),
             text_color=("#1E293B", "#E2E8F0")
         )

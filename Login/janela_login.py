@@ -13,8 +13,8 @@ USUARIOS_SISTEMA = {
     "admin_juliana": {
         "senha": "159753",
         "nome": "Juliana",
-        "perfil": "admin",
-        "modulos": ["*"]  # Acesso total
+        "perfil": "operador",
+        "modulos": ["almoxarifado"]  # Acesso apenas ao almoxarifado
     },
     "user": {
         "senha": "user",
@@ -198,7 +198,7 @@ class JanelaLogin(ctk.CTk):
         # Input text
         self.entry_usuario = ctk.CTkEntry(
             self.user_box,
-            placeholder_text="ex: tk",
+            placeholder_text="ex: operador",
             font=ctk.CTkFont(family="Segoe UI", size=12),
             fg_color="transparent",
             border_width=0,

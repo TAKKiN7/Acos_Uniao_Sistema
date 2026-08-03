@@ -176,15 +176,7 @@ class JanelaPrincipal(ctk.CTk):
             font=ctk.CTkFont(size=11, weight="bold"),
             text_color=("#0F172A", "#E2E8F0")
         )
-        self.lbl_user.pack(anchor="w", padx=12, pady=(8, 2))
-
-        self.lbl_version = ctk.CTkLabel(
-            self.user_info_frame,
-            text="v1.0.4",
-            font=ctk.CTkFont(size=10, weight="bold"),
-            text_color=("#334155", "#718096")
-        )
-        self.lbl_version.pack(anchor="w", padx=12, pady=(0, 8))
+        self.lbl_user.pack(anchor="w", padx=12, pady=10)
 
         # Botão Trocar de Usuário (Azul)
         self.btn_trocar_user = ctk.CTkButton(

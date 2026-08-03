@@ -151,7 +151,7 @@ class SaidaFrame(ctk.CTkFrame):
         produto_nome = str(self.values[1])
         new_values = (produto_nome, quantidade_nova, self.codigo)
 
-        database.atualizar_produto(self.codigo, new_values)
+        database.atualizar_produto(self.codigo, new_values, master=self)
         msg.showinfo("Saída Realizada", f"Saída de {qtd_saida} unidades registrada!\nNovo estoque: {quantidade_nova}")
         
         if self.callback_sucesso:

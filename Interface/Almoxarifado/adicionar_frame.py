@@ -136,7 +136,7 @@ class AdicionarFrame(ctk.CTkFrame):
             return
 
         values = (produto.lower(), qtd)
-        res = database.inserir_porduto(values)
+        res = database.inserir_porduto(values, master=self)
         
         msg.showinfo("Sucesso", f"Produto '{produto.upper()}' cadastrado com sucesso!")
         if self.callback_sucesso:

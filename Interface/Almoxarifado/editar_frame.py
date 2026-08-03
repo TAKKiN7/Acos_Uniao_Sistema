@@ -137,7 +137,7 @@ class EditarFrame(ctk.CTkFrame):
             return
 
         new_values = (produto, qtd, self.codigo)
-        database.atualizar_produto(self.codigo, new_values)
+        database.atualizar_produto(self.codigo, new_values, master=self)
 
         msg.showinfo("Sucesso", "Produto atualizado com sucesso!")
         if self.callback_sucesso:
