@@ -1,26 +1,22 @@
 import win32com.client
+import pythoncom
 from pathlib import Path
 from tkinter import messagebox as msg
 from time import sleep as pause
 
 
-
 def baixar_anexos(chave):
-
-    try:  
-        numero = chave[27:34]
-
+    pythoncom.CoInitialize()
+    try:
+        numero = chave[27:34] if len(chave) >= 34 else chave
 
         xml = Path(Path.home() / "Desktop" / "GERDAU" / f"{chave} NF {numero}.xml")
         pause(1)
 
-
         print(xml)
 
         if xml.is_file():
-            print('to aqui')
-        
-       
+            print('XML já existe no computador.')
         else:
             # Pasta onde os anexos serão salvos
             destino = Path.home() / "Desktop" / "GERDAU"
@@ -32,33 +28,24 @@ def baixar_anexos(chave):
             caixa_entrada = namespace.GetDefaultFolder(6)
 
             for email in caixa_entrada.Items:
+                try:
+                    assunto = str(getattr(email, "Subject", ""))
+                    if numero in assunto:
+                        print(f"E-mail encontrado: {assunto}")
+                        attachments = getattr(email, "Attachments", None)
+                        if attachments:
+                            for i in range(1, attachments.Count + 1):
+                                anexo = attachments.Item(i)
+                                arquivo = Path(anexo.FileName)
+                                novo_nome = f"{chave} NF {numero}{arquivo.suffix}"
+                                caminho = destino / novo_nome
+                                anexo.SaveAsFile(str(caminho))
+                                print(f"Anexo salvo: {anexo.FileName}")
+                except Exception as e_item:
+                    print(f"Erro ao ler item de e-mail: {e_item}")
 
-                assunto = str(email.Subject)
-
-                if numero in assunto:
-
-                    print(f"E-mail encontrado: {assunto}")
-
-                    for i in range(1, email.Attachments.Count + 1):
-
-                        anexo = email.Attachments.Item(i)
-
-                        arquivo = Path(anexo.FileName)
-
-                        novo_nome = f"{chave} NF {numero}{arquivo.suffix}"
-
-                        caminho = destino / novo_nome
-
-                        anexo.SaveAsFile(str(caminho))
-
-                        print(f"Anexo salvo: {anexo.FileName}")
     except Exception as e:
-
-        print(f"Erro: {e}")
-        msg.showerror(
-        "Falha",
-        f"Ocorreu um erro:\n{e}"
-        )
-        #msg.showerror("Falha", "Ocorreu um erro durante a leitura da chave de acesso, tente novamente por favor.")
-    else:
-        pass
+        print(f"Erro ao baixar anexos GERDAU: {e}")
+        msg.showerror("Falha", f"Ocorreu um erro durante a busca do XML Gerdau:\n{e}")
+    finally:
+        pythoncom.CoUninitialize()

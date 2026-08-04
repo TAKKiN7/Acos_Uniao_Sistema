@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from threading import Thread
 from Interface.Materia_Prima.Functions.nota_entrada_usiminas import usiminas_start
 
 
@@ -74,7 +75,25 @@ class UsiminasFrame(ctk.CTkFrame):
 
         if not chave:
             messagebox.showwarning("Campo Vazio", "Por favor, preencha a chave de acesso da Nota USIMINAS.")
-        else:
-            #messagebox.showinfo("Lançamento USIMINAS", f"Processando USIMINAS:\n• Chave: {chave}")
-            usiminas_start(chave)
+            return
+
+        self.btn_iniciar.configure(
+            text="⏳ LANÇAMENTO EM ANDAMENTO...",
+            fg_color="#D97706",
+            hover_color="#B45309",
+            state="disabled"
+        )
+
+        def runner():
+            try:
+                usiminas_start(chave)
+            finally:
+                self.after(0, lambda: self.btn_iniciar.configure(
+                    text="INICIAR LANÇAMENTO USIMINAS  ▶",
+                    fg_color="#EA580C",
+                    hover_color="#C2410C",
+                    state="normal"
+                ))
+
+        Thread(target=runner, daemon=True).start()
             

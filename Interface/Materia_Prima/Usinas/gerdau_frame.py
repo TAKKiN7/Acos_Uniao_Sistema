@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from threading import Thread
 from Interface.Materia_Prima.Functions.nota_entrada_gerdau import gerdau_start
 
 class GerdauFrame(ctk.CTkFrame):
@@ -75,6 +76,24 @@ class GerdauFrame(ctk.CTkFrame):
 
         if not chave:
             messagebox.showwarning("Campo Vazio", "Por favor, preencha a chave de acesso da Nota GERDAU.")
-        else:
-            #messagebox.showinfo("Lançamento GERDAU", f"Processando GERDAU:\n• Chave: {chave}")
-            gerdau_start(chave)
+            return
+
+        self.btn_iniciar.configure(
+            text="⏳ LANÇAMENTO EM ANDAMENTO...",
+            fg_color="#D97706",
+            hover_color="#B45309",
+            state="disabled"
+        )
+
+        def runner():
+            try:
+                gerdau_start(chave)
+            finally:
+                self.after(0, lambda: self.btn_iniciar.configure(
+                    text="INICIAR LANÇAMENTO GERDAU  ▶",
+                    fg_color="#1D4ED8",
+                    hover_color="#1E40AF",
+                    state="normal"
+                ))
+
+        Thread(target=runner, daemon=True).start()

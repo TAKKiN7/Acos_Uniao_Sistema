@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from pathlib import Path
 
 # Dicionário de Usuários e Controle de Permissões por Módulo
 # "tk" : "347" é Administrador com acesso a todos os módulos ("*")
@@ -66,6 +67,9 @@ class JanelaLogin(ctk.CTk):
         
         # Centralizar a janela na tela
         self.centralizar_janela(390, 510)
+
+        # Configurar Ícone do Sistema
+        self.definir_icone()
 
         # Modo de aparência escuro por padrão
         ctk.set_appearance_mode("Dark")
@@ -369,6 +373,15 @@ class JanelaLogin(ctk.CTk):
             self.callback_sucesso(usuario, dados_user)
         else:
             self.destroy()
+
+    def definir_icone(self):
+        """Define o ícone oficial do sistema (01.ico)."""
+        caminho_icone = Path(__file__).resolve().parent.parent / "Configurações" / "imagens" / "01.ico"
+        if caminho_icone.exists():
+            try:
+                self.iconbitmap(str(caminho_icone))
+            except Exception as e:
+                print(f"Aviso: Não foi possível definir o ícone na JanelaLogin: {e}")
 
 if __name__ == "__main__":
     app = JanelaLogin()

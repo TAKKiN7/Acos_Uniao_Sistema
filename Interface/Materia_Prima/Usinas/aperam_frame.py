@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from threading import Thread
 from Interface.Materia_Prima.Functions.nota_entrada_aperam import aperam_start
 
 
@@ -97,6 +98,24 @@ class AperamFrame(ctk.CTkFrame):
 
         if not lotes or not chave:
             messagebox.showwarning("Campos Incompletos", "Por favor, preencha a quantidade de lotes e a chave de acesso da Nota APERAM.")
-        else:
-            #messagebox.showinfo("Lançamento APERAM", f"Processando APERAM:\n• Lotes: {lotes}\n• Chave: {chave}")
-            aperam_start(chave, lotes)
+            return
+
+        self.btn_iniciar.configure(
+            text="⏳ LANÇAMENTO EM ANDAMENTO...",
+            fg_color="#D97706",
+            hover_color="#B45309",
+            state="disabled"
+        )
+
+        def runner():
+            try:
+                aperam_start(chave, lotes)
+            finally:
+                self.after(0, lambda: self.btn_iniciar.configure(
+                    text="INICIAR LANÇAMENTO APERAM  ▶",
+                    fg_color="#1D4ED8",
+                    hover_color="#1E40AF",
+                    state="normal"
+                ))
+
+        Thread(target=runner, daemon=True).start()

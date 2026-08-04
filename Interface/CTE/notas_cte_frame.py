@@ -1,14 +1,19 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from threading import Thread
+
+from Interface.CTE.lancamento_cte import executar_lancamento_cte
 
 class NotasCTEFrame(ctk.CTkFrame):
     """
     Frame referente à aba 'Notas CTE'.
-    Contém instruções de validação de CT-e e campo para data de vencimento.
-    Modo claro ajustado para tom cinza suave e elegante.
+    Contém instruções de validação de CT-e, campo para data de vencimento (com bind no Enter)
+    e acionamento da automação de lançamento de Notas CTE.
     """
-    def __init__(self, parent):
+    def __init__(self, parent, usuario_logado="Operador Sistema", dados_usuario=None):
         super().__init__(parent, fg_color="transparent")
+        self.usuario_logado = usuario_logado
+        self.dados_usuario = dados_usuario or {}
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(2, weight=1)
@@ -39,7 +44,7 @@ class NotasCTEFrame(ctk.CTkFrame):
         self.content_grid.grid_columnconfigure(0, weight=4)
         self.content_grid.grid_columnconfigure(1, weight=5)
 
-        # Left Card - Instructions (Cinza Suave no modo claro)
+        # Left Card - Instructions
         self.left_card = ctk.CTkFrame(
             self.content_grid,
             fg_color=("#F0F4F8", "#1E2228"),
@@ -59,13 +64,16 @@ class NotasCTEFrame(ctk.CTkFrame):
 
         self.lbl_inst_desc = ctk.CTkLabel(
             self.left_card,
-            text="Insira a data de vencimento correspondente para sincronizar o manifesto de transporte e validar os Conhecimentos de Transporte Eletrônicos (CT-e).",
+            text="Insira a data de vencimento correspondente para sincronizar o manifesto de transporte e validar os Conhecimentos de Transporte Eletrônicos (CT-e).\n\n"
+                 "Ao iniciar, a automação aguardará as confirmações via mouse:\n"
+                 "• Botão lateral X2: Avança para a próxima etapa.\n"
+                 "• Botão lateral X : Cancela a automação.",
             font=ctk.CTkFont(size=13),
             text_color=("#1E293B", "#9CA3AF"),
             wraplength=280,
             justify="left"
         )
-        self.lbl_inst_desc.pack(anchor="w", padx=25, pady=(0, 40))
+        self.lbl_inst_desc.pack(anchor="w", padx=25, pady=(0, 20))
 
         # Status Box at bottom of left card
         self.status_box = ctk.CTkFrame(
@@ -85,7 +93,7 @@ class NotasCTEFrame(ctk.CTkFrame):
         )
         self.lbl_status.pack(padx=15, pady=10, anchor="w")
 
-        # Right Card - Form (Cinza Suave no modo claro)
+        # Right Card - Form
         self.right_card = ctk.CTkFrame(
             self.content_grid,
             fg_color=("#F0F4F8", "#1E2228"),
@@ -97,13 +105,13 @@ class NotasCTEFrame(ctk.CTkFrame):
 
         self.lbl_date_label = ctk.CTkLabel(
             self.right_card,
-            text="DATA DE VENCIMENTO",
+            text="DATA DE VENCIMENTO (Pressione Enter):",
             font=ctk.CTkFont(size=11, weight="bold"),
             text_color=("#C2410C", "#FF6B00")
         )
         self.lbl_date_label.pack(anchor="w", padx=30, pady=(35, 8))
 
-        # Entry for Date (Campo Cinza Suave)
+        # Entry for Date
         self.entry_date = ctk.CTkEntry(
             self.right_card,
             placeholder_text="📅  DD/MM/AAAA",
@@ -116,6 +124,8 @@ class NotasCTEFrame(ctk.CTkFrame):
             corner_radius=8
         )
         self.entry_date.pack(fill="x", padx=30, pady=(0, 5))
+        # Bind da tecla Enter
+        self.entry_date.bind("<Return>", lambda event: self.processar_inicio())
 
         self.lbl_format_hint = ctk.CTkLabel(
             self.right_card,
@@ -143,5 +153,29 @@ class NotasCTEFrame(ctk.CTkFrame):
         data = self.entry_date.get().strip()
         if not data:
             messagebox.showwarning("Campo Vazio", "Por favor, insira a data de vencimento.")
-        else:
-            messagebox.showinfo("Processamento Iniciado", f"Manifesto sincronizado para a data: {data}")
+            return
+
+        perfil = self.dados_usuario.get("perfil", "operador")
+        user_role = "Admin" if perfil == "admin" or self.usuario_logado == "tk" else "Operador"
+
+        # Atualiza o botão para indicar andamento e impede novos cliques
+        self.btn_iniciar.configure(
+            text="⏳ LANÇAMENTO EM ANDAMENTO...",
+            fg_color="#D97706",
+            hover_color="#B45309",
+            state="disabled"
+        )
+
+        def runner():
+            try:
+                executar_lancamento_cte(data, user_role, self)
+            finally:
+                self.after(0, lambda: self.btn_iniciar.configure(
+                    text="INICIAR  ▶",
+                    fg_color="#1D4ED8",
+                    hover_color="#1E40AF",
+                    state="normal"
+                ))
+
+        # Dispara a automação em uma thread secundária
+        Thread(target=runner, daemon=True).start()

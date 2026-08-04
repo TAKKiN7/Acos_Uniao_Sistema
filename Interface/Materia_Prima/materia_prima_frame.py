@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from threading import Thread
 from Interface.Materia_Prima.Usinas.baixar_anexos import baixar_anexos, baixar_xml
 
 
@@ -172,6 +173,20 @@ class MateriaPrimaFrame(ctk.CTkFrame):
         )
         self.chk_somente_xml.pack(anchor="w", padx=5, pady=(0, 10))
 
+        # Botão Ação Download
+        self.btn_executar_download = ctk.CTkButton(
+            self.frame_busca_xml,
+            text="📥  INICIAR DOWNLOAD DE ANEXOS/XML",
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color="#0052FF",
+            hover_color="#003EB8",
+            text_color="#FFFFFF",
+            height=40,
+            corner_radius=8,
+            command=self.buscar_anexos_xml
+        )
+        self.btn_executar_download.pack(fill="x", padx=5, pady=(0, 10))
+
         # 4. Dynamic Sub-Container onde os frames das usinas são carregados
         self.usinas_container = ctk.CTkFrame(self, fg_color="transparent")
         self.usinas_container.grid(row=3, column=0, sticky="ew", padx=30, pady=(0, 15))
@@ -193,16 +208,47 @@ class MateriaPrimaFrame(ctk.CTkFrame):
             self.entry_chave_xml.focus_set()
 
     def buscar_anexos_xml(self):
-        """Ação disparada ao pressionar Enter na caixa da chave de acesso."""
+        """Ação disparada ao pressionar Enter na caixa da chave de acesso ou clicar no botão."""
         chave = self.entry_chave_xml.get().strip()
         somente_xml = bool(self.chk_somente_xml.get())
         if not chave:
             messagebox.showwarning("Chave Não Informada", "Por favor, digite ou bipe a chave de acesso da nota.")
-        else:
-            if not somente_xml:
-                baixar_anexos(chave)
-            else:
-                baixar_xml(chave)
+            return
+
+        # Impede chamadas simultâneas se já estiver baixando
+        if getattr(self, "_downloading", False):
+            return
+
+        self._downloading = True
+        self.btn_executar_download.configure(
+            text="⏳ BAIXANDO ANEXOS NO OUTLOOK...",
+            fg_color="#D97706",
+            hover_color="#B45309",
+            state="disabled"
+        )
+        self.btn_baixar_anexos.configure(state="disabled")
+
+        def runner():
+            try:
+                if not somente_xml:
+                    baixar_anexos(chave)
+                else:
+                    baixar_xml(chave)
+            finally:
+                def reset_ui():
+                    self._downloading = False
+                    self.btn_executar_download.configure(
+                        text="📥  INICIAR DOWNLOAD DE ANEXOS/XML",
+                        fg_color="#0052FF",
+                        hover_color="#003EB8",
+                        state="normal"
+                    )
+                    self.btn_baixar_anexos.configure(state="normal")
+                    messagebox.showinfo("Download Concluído", f"Busca e download concluídos para a chave:\n{chave}")
+
+                self.after(0, reset_ui)
+
+        Thread(target=runner, daemon=True).start()
 
     def inicializar_frames_usinas(self):
         """Instancia os 3 frames individuais de cada usina dentro do container."""

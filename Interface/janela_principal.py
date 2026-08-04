@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import datetime
 from tkinter import messagebox
+from pathlib import Path
 
 # Importação dos frames das abas dos arquivos separados
 from Interface.Status.status_frame import StatusFrame
@@ -36,6 +37,9 @@ class JanelaPrincipal(ctk.CTk):
         self.geometry("1240x780")
         self.minsize(1024, 680)
 
+        # Configurar Ícone do Sistema
+        self.definir_icone()
+
         # Layout Principal (Grid: Sidebar na col 0, Conteúdo Principal na col 1)
         self.grid_columnconfigure(0, weight=0) # Sidebar largura fixa
         self.grid_columnconfigure(1, weight=1) # Área central flexível
@@ -49,7 +53,6 @@ class JanelaPrincipal(ctk.CTk):
         # Construção da Interface
         self.criar_sidebar()
         self.criar_topbar()
-        self.criar_rodape()
 
         # Container Principal onde os frames das abas serão exibidos
         self.container_principal = ctk.CTkFrame(
@@ -121,10 +124,9 @@ class JanelaPrincipal(ctk.CTk):
             ("materia_prima", "  NOTAS DE MATÉRIA-PRIMA", self.abrir_materia_prima),
             ("notas_cte", "  NOTAS CTE", self.abrir_notas_cte),
             ("uso_consumo", "  NOTAS DE USO E CONSUMO", self.abrir_uso_consumo),
-            ("faturamento", "  FATURAMENTO", lambda: self.menu_em_desenvolvimento("Faturamento")),
             ("almoxarifado", "  ALMOXARIFADO", self.abrir_almoxarifado),
-            ("ti", "  TI", lambda: self.menu_em_desenvolvimento("Módulo TI")),
-            ("impressoras", "  IMPRESSORAS", lambda: self.menu_em_desenvolvimento("Impressoras"))
+            ("faturamento", "  FATURAMENTO", lambda: self.menu_em_desenvolvimento("Faturamento")),
+            ("ti", "  TI", lambda: self.menu_em_desenvolvimento("Módulo TI"))
         ]
 
         for index, (chave, texto, comando) in enumerate(self.menu_items, start=2):
@@ -228,7 +230,7 @@ class JanelaPrincipal(ctk.CTk):
         )
         self.lbl_app_title.grid(row=0, column=0, padx=25, pady=15, sticky="w")
 
-        # Lado direito do cabeçalho (Relógio Digital)
+        # Lado direito do cabeçalho (Relógio Digital + Modo do Usuário)
         self.header_right = ctk.CTkFrame(self.topbar, fg_color="transparent")
         self.header_right.grid(row=0, column=1, padx=25, pady=10, sticky="e")
 
@@ -239,30 +241,9 @@ class JanelaPrincipal(ctk.CTk):
             font=ctk.CTkFont(size=12, weight="bold"),
             text_color="#94A3B8"
         )
-        self.lbl_relogio.pack(side="left", padx=15)
+        self.lbl_relogio.pack(side="left", padx=(0, 15))
 
-    def criar_rodape(self):
-        """Cria o rodapé inferior informativo com indicador de perfil de acesso."""
-        self.rodape = ctk.CTkFrame(
-            self, 
-            height=35, 
-            fg_color=("#F0F4F8", "#121418"), 
-            border_color=("#94A3B8", "#262B34"), 
-            border_width=1, 
-            corner_radius=0
-        )
-        self.rodape.grid(row=2, column=1, sticky="ew")
-        self.rodape.grid_columnconfigure((0, 1), weight=1)
-
-        self.lbl_rodape_esq = ctk.CTkLabel(
-            self.rodape,
-            text="SISTEMA INTEGRADO AÇOS UNIÃO",
-            font=ctk.CTkFont(size=10, weight="bold"),
-            text_color=("#1E293B", "#94A3B8")
-        )
-        self.lbl_rodape_esq.grid(row=0, column=0, padx=20, pady=8, sticky="w")
-
-        # Indicador de perfil (ADMIN / OPERADOR)
+        # Indicador de perfil (ADMIN / OPERADOR) logo após a data
         perfil = self.dados_usuario.get("perfil", "operador")
         if perfil == "admin":
             texto_perfil = "🟢 MODO ADMINISTRADOR"
@@ -271,13 +252,13 @@ class JanelaPrincipal(ctk.CTk):
             texto_perfil = "🔵 MODO OPERADOR"
             cor_perfil = ("#1D4ED8", "#3B82F6")
 
-        self.lbl_rodape_dir = ctk.CTkLabel(
-            self.rodape,
+        self.lbl_modo_usuario = ctk.CTkLabel(
+            self.header_right,
             text=texto_perfil,
-            font=ctk.CTkFont(size=10, weight="bold"),
+            font=ctk.CTkFont(size=11, weight="bold"),
             text_color=cor_perfil
         )
-        self.lbl_rodape_dir.grid(row=0, column=1, padx=20, pady=8, sticky="e")
+        self.lbl_modo_usuario.pack(side="left", padx=(5, 0))
 
     def inicializar_abas(self):
         """Instancia os frames contidos nos arquivos externos e guarda no dicionário."""
@@ -296,7 +277,11 @@ class JanelaPrincipal(ctk.CTk):
         self.frames["materia_prima"] = frame_mp
 
         # Frame 2: Notas CTE (notas_cte_frame.py)
-        frame_cte = NotasCTEFrame(self.container_principal)
+        frame_cte = NotasCTEFrame(
+            self.container_principal,
+            usuario_logado=self.usuario_logado,
+            dados_usuario=self.dados_usuario
+        )
         frame_cte.grid(row=0, column=0, sticky="nsew")
         self.frames["notas_cte"] = frame_cte
 
@@ -392,3 +377,12 @@ class JanelaPrincipal(ctk.CTk):
         """Alterna entre modo tela cheia (fullscreen) e janela ao pressionar a tecla F11."""
         estado_atual = self.attributes("-fullscreen")
         self.attributes("-fullscreen", not estado_atual)
+
+    def definir_icone(self):
+        """Define o ícone oficial do sistema (01.ico)."""
+        caminho_icone = Path(__file__).resolve().parent.parent / "Configurações" / "imagens" / "01.ico"
+        if caminho_icone.exists():
+            try:
+                self.iconbitmap(str(caminho_icone))
+            except Exception as e:
+                print(f"Aviso: Não foi possível definir o ícone na JanelaPrincipal: {e}")
