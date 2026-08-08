@@ -31,15 +31,16 @@ def baixar_anexos(chave):
                         for i in range(1, attachments.Count + 1):
                             anexo = attachments.Item(i)
                             arquivo = Path(anexo.FileName)
-                            novo_nome = f"{arquivo.stem} NF {numero}{arquivo.suffix}"
 
                             if arquivo.suffix.lower() == ".pdf":
+                                novo_nome = f"{arquivo.stem} NF {numero}{arquivo.suffix}"
                                 caminho = destino_certificado / novo_nome
                             else:
+                                novo_nome = f"{chave}{arquivo.suffix}"
                                 caminho = destino_xml / novo_nome
 
                             anexo.SaveAsFile(str(caminho))
-                            print(f"Anexo salvo: {anexo.FileName}")
+                            print(f"Anexo salvo: {novo_nome}")
             except Exception as e_item:
                 print(f"Erro ao processar item do Outlook: {e_item}")
 
@@ -76,15 +77,15 @@ def baixar_xml(chave):
                         for i in range(1, attachments.Count + 1):
                             anexo = attachments.Item(i)
                             arquivo = Path(anexo.FileName)
-                            novo_nome = f"{chave} NF {numero}{arquivo.suffix}"
 
                             if arquivo.suffix.lower() == ".pdf":
                                 continue
                             else:
+                                novo_nome = f"{chave}{arquivo.suffix}"
                                 caminho = destino_xml / novo_nome
 
                             anexo.SaveAsFile(str(caminho))
-                            print(f"Anexo salvo: {anexo.FileName}")
+                            print(f"Anexo salvo: {novo_nome}")
             except Exception as e_item:
                 print(f"Erro ao processar item do Outlook: {e_item}")
 

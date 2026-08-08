@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from threading import Thread
+import pyautogui
 from Interface.Materia_Prima.Usinas.baixar_anexos import baixar_anexos, baixar_xml
 
 
@@ -146,7 +147,7 @@ class MateriaPrimaFrame(ctk.CTkFrame):
         # Caixa de texto (Entry) com borda azul destacada e altura 44px
         self.entry_chave_xml = ctk.CTkEntry(
             self.frame_busca_xml,
-            placeholder_text="Digite ou bipe a chave de acesso (44 dígitos) e pressione Enter...",
+            placeholder_text="Digite ou cole uma ou mais chaves de acesso (separadas por espaço)...",
             font=ctk.CTkFont(size=13),
             fg_color=("#FFFFFF", "#14171C"),
             border_color=("#2563EB", "#3B82F6"),
@@ -157,7 +158,8 @@ class MateriaPrimaFrame(ctk.CTkFrame):
             corner_radius=8
         )
         self.entry_chave_xml.pack(fill="x", padx=5, pady=(0, 10))
-        self.entry_chave_xml.bind("<Return>", lambda event: self.buscar_anexos_xml())
+        # Bind no Return para pressionar a tecla Espaço via PyAutoGUI ao bipar/pressionar Enter
+        self.entry_chave_xml.bind("<Return>", self.adicionar_espaco_chave)
 
         # Checkbox "Somente XML"
         self.chk_somente_xml = ctk.CTkCheckBox(
@@ -207,12 +209,21 @@ class MateriaPrimaFrame(ctk.CTkFrame):
             self.frame_busca_xml.pack(fill="x", padx=15, pady=(0, 10))
             self.entry_chave_xml.focus_set()
 
+    def adicionar_espaco_chave(self, event=None):
+        """Ao pressionar Enter na caixa de chaves, simula o pressionamento da tecla Espaço usando PyAutoGUI."""
+        pyautogui.press("space")
+        return "break"
+
     def buscar_anexos_xml(self):
-        """Ação disparada ao pressionar Enter na caixa da chave de acesso ou clicar no botão."""
-        chave = self.entry_chave_xml.get().strip()
+        """Ação disparada exclusivamente ao clicar no botão INICIAR DOWNLOAD DE ANEXOS/XML."""
+        texto = self.entry_chave_xml.get().strip()
         somente_xml = bool(self.chk_somente_xml.get())
-        if not chave:
-            messagebox.showwarning("Chave Não Informada", "Por favor, digite ou bipe a chave de acesso da nota.")
+        
+        # Extrai várias chaves separadas por espaço, tabulação ou quebra de linha
+        chaves = [c.strip() for c in texto.split() if c.strip()]
+
+        if not chaves:
+            messagebox.showwarning("Chave Não Informada", "Por favor, digite ou cole pelo menos uma chave de acesso.")
             return
 
         # Impede chamadas simultâneas se já estiver baixando
@@ -221,7 +232,7 @@ class MateriaPrimaFrame(ctk.CTkFrame):
 
         self._downloading = True
         self.btn_executar_download.configure(
-            text="⏳ BAIXANDO ANEXOS NO OUTLOOK...",
+            text=f"⏳ BAIXANDO ANEXOS (0/{len(chaves)})...",
             fg_color="#D97706",
             hover_color="#B45309",
             state="disabled"
@@ -230,10 +241,16 @@ class MateriaPrimaFrame(ctk.CTkFrame):
 
         def runner():
             try:
-                if not somente_xml:
-                    baixar_anexos(chave)
-                else:
-                    baixar_xml(chave)
+                total = len(chaves)
+                for idx, chave in enumerate(chaves, 1):
+                    # Atualiza o progresso visual no botão para cada chave
+                    self.after(0, lambda i=idx, t=total: self.btn_executar_download.configure(
+                        text=f"⏳ BAIXANDO ANEXOS ({i}/{t})..."
+                    ))
+                    if not somente_xml:
+                        baixar_anexos(chave)
+                    else:
+                        baixar_xml(chave)
             finally:
                 def reset_ui():
                     self._downloading = False
@@ -244,7 +261,11 @@ class MateriaPrimaFrame(ctk.CTkFrame):
                         state="normal"
                     )
                     self.btn_baixar_anexos.configure(state="normal")
-                    messagebox.showinfo("Download Concluído", f"Busca e download concluídos para a chave:\n{chave}")
+                    qtd = len(chaves)
+                    messagebox.showinfo(
+                        "Download Concluído",
+                        f"Busca e download concluídos com sucesso para {qtd} chave(s) de acesso!"
+                    )
 
                 self.after(0, reset_ui)
 

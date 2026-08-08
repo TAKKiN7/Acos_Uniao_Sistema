@@ -1,7 +1,7 @@
 import customtkinter as ctk
 
-from Interface.Uso_Consumo.pedido_frame import PedidoFrame
-from Interface.Uso_Consumo.cadastrar_produtos_frame import CadastrarProdutosFrame
+from Interface.Uso_Consumo.Pedido.pedido_frame import PedidoFrame
+from Interface.Uso_Consumo.Cadastrar_Produtos.cadastrar_produtos_frame import CadastrarProdutosFrame
 from Interface.Uso_Consumo.lancar_nota_frame import LancarNotaFrame
 
 class UsoConsumoFrame(ctk.CTkFrame):

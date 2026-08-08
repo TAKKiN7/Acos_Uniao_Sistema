@@ -199,7 +199,7 @@ def usiminas_start(chave):
     pause()
 
     
-    click(x=328, y=415)
+    click(x=328, y=426)
     write("0")
     enter__(9)
     write("1,65")

@@ -3,8 +3,8 @@ from tkinter import messagebox
 from threading import Thread
 from pathlib import Path
 
-from Interface.Uso_Consumo.nf_uso_consumo_leitura import ler_nfe
-from Interface.Uso_Consumo.cadastrar_itens import iniciar
+from Interface.Uso_Consumo.Cadastrar_Produtos.nf_uso_consumo_leitura import ler_nfe
+from Interface.Uso_Consumo.Cadastrar_Produtos.cadastrar_itens import iniciar
 
 
 class JanelaItensModal(ctk.CTkToplevel):
@@ -190,7 +190,7 @@ class JanelaItensModal(ctk.CTkToplevel):
 
     def definir_icone(self):
         """Define o ícone oficial do sistema (01.ico)."""
-        caminho_icone = Path(__file__).resolve().parent.parent.parent / "Configurações" / "imagens" / "01.ico"
+        caminho_icone = Path(__file__).resolve().parent.parent.parent.parent / "Configurações" / "imagens" / "01.ico"
         if caminho_icone.exists():
             try:
                 self.after(200, lambda: self.iconbitmap(str(caminho_icone)))

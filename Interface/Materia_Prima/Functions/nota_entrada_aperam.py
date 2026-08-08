@@ -99,12 +99,15 @@ Lotes: {lotes}""")
     click(x=282, y=658)
     pause()
     click(x=739, y=228)
-    res = wait_enter()
-    if not res:
-        return
 
-    for c in range(lotes):
-        click(x=328, y=415)
+    res = wait_enter()
+    if not res: 
+        return
+    
+
+    int_lotes = int(lotes)
+    for c in range(int_lotes):
+        click(x=328, y=426)
         write("0")
         enter__(9)
         write("1,65")

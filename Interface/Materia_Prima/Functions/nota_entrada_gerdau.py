@@ -137,7 +137,7 @@ Peso: {peso}""")
 
 
     
-    click(x=328, y=415)
+    click(x=328, y=426)
     write("0")
     enter__(9)
     write("1,65")
@@ -156,7 +156,7 @@ Peso: {peso}""")
     for l in lote:
         write(l)
 
-    enter__(2)
+    enter__(1)
     for p in peso:
         write(p)
 

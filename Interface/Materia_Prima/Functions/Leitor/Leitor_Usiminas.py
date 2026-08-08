@@ -77,19 +77,14 @@ def processar_nfe(caminho_xml: str) -> None:
 
  
 def leitura_xml(chave):
+    caminho_pasta: Path = Path.home() / r"Desktop\USIMINAS"
+    numero = chave[27:34] if len(chave) >= 34 else chave
 
-    caminho_pasta  : Path = Path.home() / r"Desktop\USIMINAS"
-    numero = chave[27:34]
-
-
-
-    caminho = rf"{caminho_pasta}\{chave} NF {numero}.xml"
- 
+    caminho = caminho_pasta / f"{chave}.xml"
+    if not caminho.exists():
+        caminho = caminho_pasta / f"{chave} NF {numero}.xml"
 
     volumes = processar_nfe(caminho)
-
-
-    
     return volumes
 
 

@@ -10,17 +10,17 @@ def baixar_anexos(chave):
     try:
         numero = chave[27:34] if len(chave) >= 34 else chave
 
-        xml = Path(Path.home() / "Desktop" / "GERDAU" / f"{chave} NF {numero}.xml")
+        pasta_gerdau = Path.home() / "Desktop" / "GERDAU"
+        xml_novo = pasta_gerdau / f"{chave}.xml"
+        xml_antigo = pasta_gerdau / f"{chave} NF {numero}.xml"
+
         pause(1)
 
-        print(xml)
-
-        if xml.is_file():
+        if xml_novo.is_file() or xml_antigo.is_file():
             print('XML já existe no computador.')
         else:
             # Pasta onde os anexos serão salvos
-            destino = Path.home() / "Desktop" / "GERDAU"
-            destino.mkdir(exist_ok=True)
+            pasta_gerdau.mkdir(exist_ok=True)
 
             outlook = win32com.client.Dispatch("Outlook.Application")
             namespace = outlook.GetNamespace("MAPI")
@@ -37,10 +37,15 @@ def baixar_anexos(chave):
                             for i in range(1, attachments.Count + 1):
                                 anexo = attachments.Item(i)
                                 arquivo = Path(anexo.FileName)
-                                novo_nome = f"{chave} NF {numero}{arquivo.suffix}"
-                                caminho = destino / novo_nome
+                                
+                                if arquivo.suffix.lower() == ".pdf":
+                                    novo_nome = f"{chave} NF {numero}{arquivo.suffix}"
+                                else:
+                                    novo_nome = f"{chave}.xml"
+                                    
+                                caminho = pasta_gerdau / novo_nome
                                 anexo.SaveAsFile(str(caminho))
-                                print(f"Anexo salvo: {anexo.FileName}")
+                                print(f"Anexo salvo: {novo_nome}")
                 except Exception as e_item:
                     print(f"Erro ao ler item de e-mail: {e_item}")
 

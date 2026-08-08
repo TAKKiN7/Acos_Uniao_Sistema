@@ -2,16 +2,15 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
-
-
-
 def leitura_xml(chave):
     ns = {'nfe': 'http://www.portalfiscal.inf.br/nfe'}
     
-    numero = chave[27:34]
+    numero = chave[27:34] if len(chave) >= 34 else chave
 
-    # nota = filedialog.askopenfilename()
-    nota = Path(Path.home() / "Desktop" / "GERDAU" / f"{chave} NF {numero}.xml")
+    pasta = Path.home() / "Desktop" / "GERDAU"
+    nota = pasta / f"{chave}.xml"
+    if not nota.exists():
+        nota = pasta / f"{chave} NF {numero}.xml"
     
     print(nota)
 
@@ -21,18 +20,13 @@ def leitura_xml(chave):
     numero_nf = root.find('.//nfe:nNF', ns)
 
     if numero_nf is not None:
-        #print(numero_nf.text)
         pass
 
-
     inf_cpl = root.find('.//nfe:infCpl', ns)
-
-    #print(inf_cpl.text)
 
     index = inf_cpl.text.find("11411000")
 
     lote = inf_cpl.text[index + 8:index + 8 + 12]
-    #print(lote)
 
     t_peso = root.find('.//nfe:pesoL', ns)
     
