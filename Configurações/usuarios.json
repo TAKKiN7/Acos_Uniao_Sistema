@@ -1,0 +1,35 @@
+{
+  "tk": {
+    "senha": "Eustaqui12",
+    "nome": "Eustáquio (TK)",
+    "perfil": "admin",
+    "modulos": [
+      "*"
+    ]
+  },
+  "admin_juliana": {
+    "senha": "159753",
+    "nome": "Juliana",
+    "perfil": "operador",
+    "modulos": [
+      "almoxarifado"
+    ]
+  },
+  "user": {
+    "senha": "user",
+    "nome": "Operador Usuário",
+    "perfil": "operador",
+    "modulos": [
+      "almoxarifado_operador"
+    ]
+  },
+  "producao": {
+    "senha": "producao",
+    "nome": "Operador Produção",
+    "perfil": "operador",
+    "modulos": [
+      "materia_prima",
+      "notas_cte"
+    ]
+  }
+}

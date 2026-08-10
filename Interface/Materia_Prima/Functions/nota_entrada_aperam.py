@@ -151,22 +151,20 @@ Lotes: {lotes}""")
     res = wait_enter()
     if not res:
         return
-    click(x=40, y=75)
+
+
+    click(x=103, y=74) # BUSCA DE MODULOS
+    write("GPM216")
+    enter__()
     pause(.5)
-    click(x=153, y=380)
-    pause(1)
-    click(x=83, y=31)
-    click(x=93, y=54)
-    pause()
-    click(x=518, y=79)
-    pause()
     click(x=640, y=395)
     enter__()
-    pause()
+    pause(.4)
     click(x=796, y=480)
-    pause()
+    pause(.4)
     moveTo(x=1334, y=157)
-    pause()
+    pause(1)
+    
     dragTo(1332, 605, duration=0.5, button="left")
 
 

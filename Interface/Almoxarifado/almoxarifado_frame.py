@@ -21,7 +21,14 @@ class AlmoxarifadoFrame(ctk.CTkFrame):
         
         # Permissões do usuário (Admin vs Operador)
         self.perfil = self.dados_usuario.get("perfil", "operador").lower()
-        self.is_admin = (self.perfil == "admin" or usuario_logado == "tk" or "*" in self.dados_usuario.get("modulos", []))
+        modulos = self.dados_usuario.get("modulos", [])
+        self.is_admin = (
+            self.perfil == "admin"
+            or usuario_logado == "tk"
+            or "*" in modulos
+            or "almoxarifado" in modulos
+            or "almoxarifado_admin" in modulos
+        )
 
         # Configuração do Layout
         self.grid_columnconfigure(0, weight=1)

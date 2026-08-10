@@ -9,6 +9,7 @@ from Interface.Materia_Prima.materia_prima_frame import MateriaPrimaFrame
 from Interface.CTE.notas_cte_frame import NotasCTEFrame
 from Interface.Uso_Consumo.uso_consumo_frame import UsoConsumoFrame
 from Interface.Almoxarifado.almoxarifado_frame import AlmoxarifadoFrame
+from Interface.Usuarios.usuarios_frame import UsuariosFrame
 
 # Configurações iniciais do CustomTkinter
 ctk.set_appearance_mode("Dark")
@@ -83,6 +84,8 @@ class JanelaPrincipal(ctk.CTk):
         perfil = self.dados_usuario.get("perfil", "operador")
         if perfil == "admin" or "*" in modulos or chave_modulo in modulos:
             return True
+        if chave_modulo == "almoxarifado" and ("almoxarifado_operador" in modulos or "almoxarifado_admin" in modulos):
+            return True
         return False
 
     def criar_sidebar(self):
@@ -126,7 +129,8 @@ class JanelaPrincipal(ctk.CTk):
             ("uso_consumo", "  NOTAS DE USO E CONSUMO", self.abrir_uso_consumo),
             ("almoxarifado", "  ALMOXARIFADO", self.abrir_almoxarifado),
             ("faturamento", "  FATURAMENTO", lambda: self.menu_em_desenvolvimento("Faturamento")),
-            ("ti", "  TI", lambda: self.menu_em_desenvolvimento("Módulo TI"))
+            ("ti", "  TI", lambda: self.menu_em_desenvolvimento("Módulo TI")),
+            ("usuarios", "  GESTÃO DE USUÁRIOS", self.abrir_usuarios)
         ]
 
         for index, (chave, texto, comando) in enumerate(self.menu_items, start=2):
@@ -299,6 +303,15 @@ class JanelaPrincipal(ctk.CTk):
         frame_almox.grid(row=0, column=0, sticky="nsew")
         self.frames["almoxarifado"] = frame_almox
 
+        # Frame 5: Gestão de Usuários (usuarios_frame.py na pasta Interface/Usuarios)
+        frame_usr = UsuariosFrame(
+            self.container_principal,
+            usuario_logado=self.usuario_logado,
+            dados_usuario=self.dados_usuario
+        )
+        frame_usr.grid(row=0, column=0, sticky="nsew")
+        self.frames["usuarios"] = frame_usr
+
     def selecionar_aba_inicial(self):
         """Abre a tela inicial de Status por padrão (sem aba no menu lateral)."""
         self.selecionar_aba("status")
@@ -341,6 +354,9 @@ class JanelaPrincipal(ctk.CTk):
         if "almoxarifado" in self.frames:
             self.frames["almoxarifado"].carregar_se_necessario()
 
+    def abrir_usuarios(self):
+        self.selecionar_aba("usuarios")
+
     def menu_em_desenvolvimento(self, nome_modulo):
         messagebox.showinfo("Módulo em Desenvolvimento", f"O módulo '{nome_modulo}' estará disponível em breve.")
 
@@ -380,9 +396,17 @@ class JanelaPrincipal(ctk.CTk):
 
     def definir_icone(self):
         """Define o ícone oficial do sistema (01.ico)."""
-        caminho_icone = Path(__file__).resolve().parent.parent / "Configurações" / "imagens" / "01.ico"
-        if caminho_icone.exists():
-            try:
-                self.iconbitmap(str(caminho_icone))
-            except Exception as e:
-                print(f"Aviso: Não foi possível definir o ícone na JanelaPrincipal: {e}")
+        import sys
+        caminhos_tentativas = []
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            caminhos_tentativas.append(Path(sys._MEIPASS) / "Configurações" / "imagens" / "01.ico")
+            caminhos_tentativas.append(Path(sys.executable).resolve().parent / "Configurações" / "imagens" / "01.ico")
+        caminhos_tentativas.append(Path(__file__).resolve().parent.parent / "Configurações" / "imagens" / "01.ico")
+
+        for caminho_icone in caminhos_tentativas:
+            if caminho_icone.exists():
+                try:
+                    self.iconbitmap(str(caminho_icone))
+                    break
+                except Exception as e:
+                    print(f"Aviso: Não foi possível definir o ícone na JanelaPrincipal: {e}")

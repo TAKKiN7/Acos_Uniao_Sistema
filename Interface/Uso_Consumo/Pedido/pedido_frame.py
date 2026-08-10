@@ -196,13 +196,21 @@ class JanelaPedidoItensModal(ctk.CTkToplevel):
 
     def definir_icone(self):
         """Define o ícone oficial do sistema (01.ico)."""
-        caminho_icone = Path(__file__).resolve().parent.parent.parent.parent / "Configurações" / "imagens" / "01.ico"
-        if caminho_icone.exists():
-            try:
-                self.after(200, lambda: self.iconbitmap(str(caminho_icone)))
-                self.iconbitmap(str(caminho_icone))
-            except Exception as e:
-                print(f"Aviso: Não foi possível definir o ícone na JanelaPedidoItensModal: {e}")
+        import sys
+        caminhos_tentativas = []
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            caminhos_tentativas.append(Path(sys._MEIPASS) / "Configurações" / "imagens" / "01.ico")
+            caminhos_tentativas.append(Path(sys.executable).resolve().parent / "Configurações" / "imagens" / "01.ico")
+        caminhos_tentativas.append(Path(__file__).resolve().parent.parent.parent.parent / "Configurações" / "imagens" / "01.ico")
+
+        for caminho_icone in caminhos_tentativas:
+            if caminho_icone.exists():
+                try:
+                    self.after(200, lambda c=caminho_icone: self.iconbitmap(str(c)))
+                    self.iconbitmap(str(caminho_icone))
+                    break
+                except Exception as e:
+                    print(f"Aviso: Não foi possível definir o ícone na JanelaPedidoItensModal: {e}")
 
 
 class PedidoFrame(ctk.CTkFrame):

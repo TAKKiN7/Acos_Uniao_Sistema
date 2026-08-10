@@ -1,37 +1,10 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from pathlib import Path
+from Login.gerenciador_usuarios import carregar_usuarios
 
-# Dicionário de Usuários e Controle de Permissões por Módulo
-# "tk" : "347" é Administrador com acesso a todos os módulos ("*")
-USUARIOS_SISTEMA = {
-    "tk": {
-        "senha": "347",
-        "nome": "Eustáquio (TK)",
-        "perfil": "admin",
-        "modulos": ["*"]  # Acesso total a todos os módulos
-    },
-    "admin_juliana": {
-        "senha": "159753",
-        "nome": "Juliana",
-        "perfil": "operador",
-        "modulos": ["almoxarifado"]  # Acesso apenas ao almoxarifado
-    },
-    "user": {
-        "senha": "user",
-        "nome": "Operador Usuário",
-        "perfil": "operador",
-        "modulos": ["materia_prima"]  # Acesso apenas ao módulo Matéria Prima
-    },
-    "producao": {
-        "senha": "producao",
-        "nome": "Operador Produção",
-        "perfil": "operador",
-        "modulos": ["materia_prima", "notas_cte"]  # Acesso a Matéria Prima e CTE
-    }
-}
-
-# Mantém compatibilidade com importações legadas
+# Carrega dicionário de usuários dinamicamente a partir de Configurações/usuarios.json
+USUARIOS_SISTEMA = carregar_usuarios()
 USUARIOS_PADRAO = USUARIOS_SISTEMA
 
 class JanelaLogin(ctk.CTk):
@@ -57,7 +30,7 @@ class JanelaLogin(ctk.CTk):
         super().__init__()
 
         # Define dicionário de usuários e suas permissões
-        self.usuarios_dict = usuarios_dict if usuarios_dict is not None else USUARIOS_SISTEMA
+        self.usuarios_dict = usuarios_dict if usuarios_dict is not None else carregar_usuarios()
         self.callback_sucesso = callback_sucesso
 
         # Configurações da Janela Compacta (390x510)
@@ -331,6 +304,7 @@ class JanelaLogin(ctk.CTk):
 
     def autenticar_usuario(self):
         """Valida as credenciais digitadas contra o dicionário de usuários."""
+        self.usuarios_dict = carregar_usuarios()
         usuario = self.entry_usuario.get().strip()
         senha = self.entry_senha.get().strip()
 
@@ -376,12 +350,20 @@ class JanelaLogin(ctk.CTk):
 
     def definir_icone(self):
         """Define o ícone oficial do sistema (01.ico)."""
-        caminho_icone = Path(__file__).resolve().parent.parent / "Configurações" / "imagens" / "01.ico"
-        if caminho_icone.exists():
-            try:
-                self.iconbitmap(str(caminho_icone))
-            except Exception as e:
-                print(f"Aviso: Não foi possível definir o ícone na JanelaLogin: {e}")
+        import sys
+        caminhos_tentativas = []
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            caminhos_tentativas.append(Path(sys._MEIPASS) / "Configurações" / "imagens" / "01.ico")
+            caminhos_tentativas.append(Path(sys.executable).resolve().parent / "Configurações" / "imagens" / "01.ico")
+        caminhos_tentativas.append(Path(__file__).resolve().parent.parent / "Configurações" / "imagens" / "01.ico")
+
+        for caminho_icone in caminhos_tentativas:
+            if caminho_icone.exists():
+                try:
+                    self.iconbitmap(str(caminho_icone))
+                    break
+                except Exception as e:
+                    print(f"Aviso: Não foi possível definir o ícone na JanelaLogin: {e}")
 
 if __name__ == "__main__":
     app = JanelaLogin()
