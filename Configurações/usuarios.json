@@ -31,5 +31,13 @@
       "materia_prima",
       "notas_cte"
     ]
+  },
+  "andre": {
+    "senha": "159753",
+    "nome": "André - Faturamento",
+    "perfil": "operador",
+    "modulos": [
+      "faturamento"
+    ]
   }
 }

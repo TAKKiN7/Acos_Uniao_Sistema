@@ -9,6 +9,8 @@ from Interface.Materia_Prima.materia_prima_frame import MateriaPrimaFrame
 from Interface.CTE.notas_cte_frame import NotasCTEFrame
 from Interface.Uso_Consumo.uso_consumo_frame import UsoConsumoFrame
 from Interface.Almoxarifado.almoxarifado_frame import AlmoxarifadoFrame
+from Interface.Faturamento.faturamento_frame import FaturamentoFrame
+from Interface.TI.ti_frame import TiFrame
 from Interface.Usuarios.usuarios_frame import UsuariosFrame
 
 # Configurações iniciais do CustomTkinter
@@ -122,15 +124,14 @@ class JanelaPrincipal(ctk.CTk):
         # Botões de Navegação (Menu Lateral)
         self.botoes_menu = {}
 
-        # Listagem de todos os itens do menu
+        # Listagem dos itens operacionais do menu
         self.menu_items = [
             ("materia_prima", "  NOTAS DE MATÉRIA-PRIMA", self.abrir_materia_prima),
             ("notas_cte", "  NOTAS CTE", self.abrir_notas_cte),
             ("uso_consumo", "  NOTAS DE USO E CONSUMO", self.abrir_uso_consumo),
             ("almoxarifado", "  ALMOXARIFADO", self.abrir_almoxarifado),
-            ("faturamento", "  FATURAMENTO", lambda: self.menu_em_desenvolvimento("Faturamento")),
-            ("ti", "  TI", lambda: self.menu_em_desenvolvimento("Módulo TI")),
-            ("usuarios", "  GESTÃO DE USUÁRIOS", self.abrir_usuarios)
+            ("faturamento", "  FATURAMENTO", self.abrir_faturamento),
+            ("ti", "  TI", self.abrir_ti)
         ]
 
         for index, (chave, texto, comando) in enumerate(self.menu_items, start=2):
@@ -166,6 +167,37 @@ class JanelaPrincipal(ctk.CTk):
 
             btn.grid(row=index, column=0, padx=12, pady=3, sticky="ew")
             self.botoes_menu[chave] = btn
+
+        # Botão Gestão de Usuários (Discreto e posicionado no fundo do menu lateral, na row 9)
+        tem_permissao_usr = self.tem_acesso_modulo("usuarios")
+        if tem_permissao_usr:
+            btn_usr = ctk.CTkButton(
+                self.sidebar,
+                text="⚙️  Gestão de Usuários",
+                anchor="w",
+                font=ctk.CTkFont(size=11, weight="normal"),
+                fg_color="transparent",
+                text_color=("#64748B", "#64748B"),
+                hover_color=("#CBD5E1", "#252A32"),
+                height=32,
+                corner_radius=6,
+                command=self.abrir_usuarios
+            )
+        else:
+            btn_usr = ctk.CTkButton(
+                self.sidebar,
+                text="🔒 Gestão de Usuários",
+                anchor="w",
+                font=ctk.CTkFont(size=10, weight="normal"),
+                fg_color="transparent",
+                text_color=("#94A3B8", "#334155"),
+                hover_color=("#E2E8F0", "#1E232B"),
+                height=32,
+                corner_radius=6,
+                command=lambda: self.acesso_negado("Gestão de Usuários")
+            )
+        btn_usr.grid(row=9, column=0, padx=15, pady=(0, 8), sticky="sew")
+        self.botoes_menu["usuarios"] = btn_usr
 
         # Rodapé do Sidebar (Usuário, Botão Trocar Usuário e Encerrar Turno)
         self.user_info_frame = ctk.CTkFrame(
@@ -303,7 +335,25 @@ class JanelaPrincipal(ctk.CTk):
         frame_almox.grid(row=0, column=0, sticky="nsew")
         self.frames["almoxarifado"] = frame_almox
 
-        # Frame 5: Gestão de Usuários (usuarios_frame.py na pasta Interface/Usuarios)
+        # Frame 5: Faturamento (faturamento_frame.py na pasta Interface/Faturamento)
+        frame_fat = FaturamentoFrame(
+            self.container_principal,
+            usuario_logado=self.usuario_logado,
+            dados_usuario=self.dados_usuario
+        )
+        frame_fat.grid(row=0, column=0, sticky="nsew")
+        self.frames["faturamento"] = frame_fat
+
+        # Frame 6: Módulo TI (ti_frame.py na pasta Interface/TI)
+        frame_ti = TiFrame(
+            self.container_principal,
+            usuario_logado=self.usuario_logado,
+            dados_usuario=self.dados_usuario
+        )
+        frame_ti.grid(row=0, column=0, sticky="nsew")
+        self.frames["ti"] = frame_ti
+
+        # Frame 7: Gestão de Usuários (usuarios_frame.py na pasta Interface/Usuarios)
         frame_usr = UsuariosFrame(
             self.container_principal,
             usuario_logado=self.usuario_logado,
@@ -329,16 +379,23 @@ class JanelaPrincipal(ctk.CTk):
         for chave, btn in self.botoes_menu.items():
             if chave == chave_aba:
                 btn.configure(
-                    fg_color="#EA580C", 
+                    fg_color="#EA580C" if chave != "usuarios" else "#334155", 
                     text_color="#FFFFFF", 
-                    hover_color="#C2410C"
+                    hover_color="#C2410C" if chave != "usuarios" else "#1E293B"
                 )
             elif self.tem_acesso_modulo(chave):
-                btn.configure(
-                    fg_color="transparent", 
-                    text_color=("#0F172A", "#A0AEC0"), 
-                    hover_color=("#CBD5E1", "#252A32")
-                )
+                if chave == "usuarios":
+                    btn.configure(
+                        fg_color="transparent",
+                        text_color=("#64748B", "#64748B"),
+                        hover_color=("#CBD5E1", "#252A32")
+                    )
+                else:
+                    btn.configure(
+                        fg_color="transparent", 
+                        text_color=("#0F172A", "#A0AEC0"), 
+                        hover_color=("#CBD5E1", "#252A32")
+                    )
 
     def abrir_materia_prima(self):
         self.selecionar_aba("materia_prima")
@@ -353,6 +410,12 @@ class JanelaPrincipal(ctk.CTk):
         self.selecionar_aba("almoxarifado")
         if "almoxarifado" in self.frames:
             self.frames["almoxarifado"].carregar_se_necessario()
+
+    def abrir_faturamento(self):
+        self.selecionar_aba("faturamento")
+
+    def abrir_ti(self):
+        self.selecionar_aba("ti")
 
     def abrir_usuarios(self):
         self.selecionar_aba("usuarios")
