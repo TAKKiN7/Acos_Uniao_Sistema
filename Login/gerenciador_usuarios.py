@@ -49,8 +49,17 @@ def carregar_usuarios() -> dict:
     caminho = obter_caminho_json()
 
     if not caminho.exists():
-        salvar_usuarios(USUARIOS_PADRAO_INICIAIS)
-        return dict(USUARIOS_PADRAO_INICIAIS)
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            caminho_meipass = Path(sys._MEIPASS) / "Configurações" / "usuarios.json"
+            if caminho_meipass.exists():
+                try:
+                    import shutil
+                    shutil.copy2(caminho_meipass, caminho)
+                except Exception as e_copy:
+                    print(f"Aviso: Não foi possível copiar usuarios.json do pacote: {e_copy}")
+        if not caminho.exists():
+            salvar_usuarios(USUARIOS_PADRAO_INICIAIS)
+            return dict(USUARIOS_PADRAO_INICIAIS)
 
     try:
         with open(caminho, "r", encoding="utf-8") as f:

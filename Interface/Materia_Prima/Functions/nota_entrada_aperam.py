@@ -49,7 +49,7 @@ Lotes: {lotes}""")
 
     #print("Conferiu o número de lote e foi pra aba do faturamento?")
     #wait_enter()
-    click(x=103, y=74) # BUSCA DE MODULOS
+    press("F5") # BUSCA DE MODULOS
     write("MTM216")
     enter__()
 
@@ -147,13 +147,27 @@ Lotes: {lotes}""")
     enter__(1)
     write("3505")
 
+    res = wait_enter()
+    if not res:
+        return
+
+    for c in range(4):
+        press("esc")
+
+    press("F5")
+    write("MTM721")
+    enter__()
+
 
     res = wait_enter()
     if not res:
         return
 
+    for c in range(4):
+        press("esc")
 
-    click(x=103, y=74) # BUSCA DE MODULOS
+
+    press("F5") # BUSCA DE MODULOS
     write("GPM216")
     enter__()
     pause(.5)

@@ -34,18 +34,10 @@ def executar_lancamento_cte(data: str, user: str = "tk", parent=None):
         print("Lançamento CTE cancelado pelo usuário.")
         return
 
-    click(x=33, y=71)
-    pause(0.5)
-    click(x=126, y=129)
-    pause(1.5)
-    click(x=336, y=33)
-    pause()
-
-    # Define se é autoridade Admin ou Operador
-    if str(user).lower() in ["admin", "tk"]:
-        click(x=372, y=236)  # Importar TK (Admin)
-    else:
-        click(x=343, y=73)   # Importar L (Operador)
+    press("F5")
+    write("MTP451")
+    enter__()
+    pause(.4)
 
     enter__(2, 0.2)
 
@@ -78,12 +70,18 @@ def executar_lancamento_cte(data: str, user: str = "tk", parent=None):
             write(n)
 
         pause()
-        enter__(1)
-        click(x=847, y=473)
-        pause()
-        click(x=885, y=566)
+        enter__(3)
 
-    pause(2)
+        pause()
+
+        for c in range(3):
+            press("tab")
+
+        pause()
+        enter__(1)
+
+        press("down")
+
     msg.showinfo("FINALIZAÇÃO", "Aguardando finalização", parent=parent)
     res = wait_enter()
     if not res:

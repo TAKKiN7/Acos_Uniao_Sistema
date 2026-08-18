@@ -119,13 +119,9 @@ def usiminas_start(chave):
     for c in range(4):
         press("esc")
 
-    click(x=x[0], y=y[0]) # diaria
-    pause()
-    moveTo(x=x[4], y=y[4]) # Nota entrada
-    pause(0.7)
-    moveTo(x=x[5], y=y[5]) # Digitação nota entrada
-    pause()
-    click(x=x[5], y=y[5]) # click em digitação nota entrada
+    press("F5") # BUSCA DE MODULOS
+    write("MTM216")
+    enter__()
 
 
     res = wait_enter()
@@ -280,7 +276,7 @@ def usiminas_start(chave):
     for c in range(4):
         press("esc")
 
-    click(x=103, y=74) # BUSCA DE MODULOS
+    press("F5") # BUSCA DE MODULOS
     write("GPM216")
     enter__()
     pause(.5)

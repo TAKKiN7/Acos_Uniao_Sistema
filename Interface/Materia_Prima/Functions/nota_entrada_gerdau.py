@@ -69,7 +69,7 @@ Peso: {peso}""")
 
 
 
-    click(x=103, y=74) # BUSCA DE MODULOS
+    press("F5") # BUSCA DE MODULOS
     write("MTM216")
     enter__()
 
@@ -207,7 +207,7 @@ Peso: {peso}""")
     for c in range(4):
         press("esc")
 
-    click(x=103, y=74) # BUSCA DE MODULOS
+    press("F5") # BUSCA DE MODULOS
     write("GPM216")
     enter__()
     pause(.5)
